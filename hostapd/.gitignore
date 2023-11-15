@@ -2,6 +2,7 @@ hostapd
 hostapd_cli
 hlr_auc_gw
 nt_password_hash
+*.swp
 test_hostapd
 loader
 libhostapd.so
