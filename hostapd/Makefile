@@ -21,13 +21,11 @@ LIBS_s := $(LIBS)
 endif
 endif
 
-ifndef CFLAGS
 # zlx start
 # CFLAGS = -MMD -O2 -Wall -g
 CFLAGS = -MMD -Wall -g -ggdb -fPIC
 LDFLAGS=-L/usr/local/ssl/lib
 # zlx end
-endif
 
 CFLAGS += $(EXTRA_CFLAGS)
 CFLAGS += -I$(abspath ../src)
