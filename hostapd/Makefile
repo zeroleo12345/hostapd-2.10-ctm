@@ -1,4 +1,4 @@
-ALL=hostapd hostapd_cli
+ALL=test_hostapd libhostapd.so loader
 CONFIG_FILE = .config
 
 include ../src/build.rules
@@ -19,6 +19,14 @@ endif
 ifndef LIBS_s
 LIBS_s := $(LIBS)
 endif
+endif
+
+ifndef CFLAGS
+# zlx start
+# CFLAGS = -MMD -O2 -Wall -g
+CFLAGS = -MMD -Wall -g -ggdb -fPIC
+LDFLAGS=-L/usr/local/ssl/lib
+# zlx end
 endif
 
 CFLAGS += $(EXTRA_CFLAGS)
@@ -1284,6 +1292,19 @@ hostapd: $(OBJS)
 	$(Q)$(CC) $(LDFLAGS) -o hostapd $(OBJS) $(LIBS)
 	@$(E) "  LD " $@
 
+test_hostapd: $(BCHECK) $(OBJS)
+	$(Q)$(CC) $(LDFLAGS) -o test_hostapd $(OBJS) $(LIBS)
+	@$(E) "  LD " $@
+
+loader: loader.c
+	g++ loader.c -ldl -o $@
+	chmod +x loader
+
+libhostapd.so: $(OBJS)
+	@$(E) "  CC  $@ ($^)"
+	$(Q)$(CC) $(LDFLAGS) -o $@ $(CFLAGS) -shared -fPIC $^ $(LIBS)
+	cp libhostapd.so ../../../lib
+
 ifdef CONFIG_WPA_TRACE
 OBJS_c += ../src/utils/trace.o
 endif
@@ -1374,5 +1395,6 @@ lcov-html:
 clean: common-clean
 	rm -f core *~ nt_password_hash hlr_auc_gw
 	rm -f sae_pk_gen
+	rm -f libhostapd.so loader test_hostapd 2>/dev/null
 	rm -f lcov.info
 	rm -rf lcov-html
